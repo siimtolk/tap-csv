@@ -15,6 +15,12 @@ SDC_SOURCE_LINENO_COLUMN = "_sdc_source_lineno"
 SDC_SOURCE_FILE_MTIME_COLUMN = "_sdc_source_file_mtime"
 
 
+import sys
+
+# Increase the maximum field size to sys.maxsize
+csv.field_size_limit(sys.maxsize)
+
+
 class CSVStream(Stream):
     """Stream class for CSV streams."""
 
