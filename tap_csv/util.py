@@ -1,20 +1,26 @@
+
 import os
-import shutil
+LOG_DIR = ".meltano/logs/tap_csv/"
+PROCESSED_FILES_LOG_PATH = "processed_files.log"
 
-def move_file_to_folder(file_path, target_folder):
-    """Move a file to the specified folder, creating the folder if it doesn't exist."""
-    
-    # Extract the filename from the file_path
-    file_name = os.path.basename(file_path)
-    
-    # Construct the target file path
-    directory_path = os.path.join(os.path.dirname(file_path),target_folder)
+def log_processed_file_path(file_path):
+        """Appends the processed file path to the log file."""
 
-    # Check if the target folder exists, create it if it does not
-    if not os.path.exists(directory_path):
-        os.makedirs(directory_path)
+         # Check if the target folder exists, create it if it does not
+        if not os.path.exists(LOG_DIR):
+            os.makedirs(LOG_DIR)
 
-    target_path = os.path.join(directory_path, file_name)
-    
-    # Move the file
-    shutil.move(file_path, target_path)
+        with open( os.path.join(LOG_DIR,PROCESSED_FILES_LOG_PATH) , "a") as file:
+            file.write(file_path + "\n")
+
+def is_file_processed(file_path):
+        """Checks if the given file path is in the processed files log."""
+        try:
+            with open(os.path.join(LOG_DIR,PROCESSED_FILES_LOG_PATH) , "r") as file:
+                for line in file:
+                    if line.strip() == file_path:
+                        return True
+        except FileNotFoundError:
+            # Log file doesn't exist means no file has been processed yet
+            return False
+        return False

@@ -5,7 +5,8 @@ from __future__ import annotations
 import csv
 import os
 
-from tap_csv.util import move_file_to_folder
+
+from tap_csv.util import PROCESSED_FILES_LOG_PATH, log_processed_file_path, is_file_processed
 
 from datetime import datetime, timezone
 from typing import Iterable, List
@@ -17,7 +18,6 @@ SDC_SOURCE_FILE_COLUMN = "_sdc_source_file"
 SDC_SOURCE_LINENO_COLUMN = "_sdc_source_lineno"
 SDC_SOURCE_FILE_MTIME_COLUMN = "_sdc_source_file_mtime"
 
-PROCESSED_FILE_DIR = 'PROCESSED'
 
 class CSVStream(Stream):
     """Stream class for CSV streams."""
@@ -31,20 +31,6 @@ class CSVStream(Stream):
         self.file_config = kwargs.pop("file_config")
         super().__init__(*args, **kwargs)
 
-        
-    def __del__(self):
-        for file_path in self.get_file_paths():
-            # Skip files that are already in the processed directory
-            if not self.is_file_processed(file_path):
-                # Move processed file
-                move_file_to_folder(file_path,PROCESSED_FILE_DIR)
-
-
-    def is_file_processed(self,file_path):
-        directory_path = os.path.dirname(file_path)
-        return os.path.basename(directory_path) == PROCESSED_FILE_DIR
-
-
     def get_records(self, context: dict | None) -> Iterable[dict]:
         """Return a generator of row-type dictionary objects.
 
@@ -52,12 +38,11 @@ class CSVStream(Stream):
         stream if partitioning is required for the stream. Most implementations do not
         require partitioning and should ignore the `context` argument.
         """
-        for file_path in self.get_file_paths():
-            # Convert both paths to absolute paths to ensure a correct comparison
-            
-            # Skip files that are already in the processed directory
-            if self.is_file_processed(file_path):
-               continue
+        for file_path in self.get_file_paths():            
+            # Skip files that are already processed
+            # Skip processed filesS
+            if is_file_processed(file_path):
+                continue
 
             file_last_modified = datetime.fromtimestamp(
                 os.path.getmtime(file_path), timezone.utc
@@ -72,6 +57,9 @@ class CSVStream(Stream):
                     if self.config.get("add_metadata_columns", False):
                         row = [file_path, file_last_modified, file_lineno, *row]
                     yield dict(zip(self.header, row))
+                    
+            # Mark filepath as processed
+            log_processed_file_path(file_path)
 
 
     
