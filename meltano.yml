@@ -1,11 +1,14 @@
 version: 1
 send_anonymous_usage_stats: true
 project_id: tap-csv
+default_environment: dev
+environments:
+- name: dev
 plugins:
   extractors:
   - name: tap-csv
     namespace: tap_csv
-    executable: -e .
+    executable: tap-csv
     capabilities:
     - state
     - catalog
@@ -32,5 +35,5 @@ plugins:
         kind: boolean
   loaders:
   - name: target-jsonl
-    variant: andyh1203
-    pip_url: target-jsonl
+    namespace: target-jsonl
+    pip_url: git+https://github.com/andyhuynh3/target-jsonl
