@@ -5,6 +5,8 @@ from __future__ import annotations
 import csv
 import os
 
+import sys
+csv.field_size_limit(sys.maxsize)
 
 from tap_csv.util import PROCESSED_FILES_LOG_PATH, log_processed_file_path, is_file_processed
 
