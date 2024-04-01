@@ -5,13 +5,6 @@ CSV tap class.
 
 Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Targets.
 
-## My variant
-
-1. increased field size to max system limit for large payloads
-2. Processed files are listed in 
-	LOG_DIR = ".meltano/logs/tap_csv/processed_files.log"
-	If path is listed, it is opitted from processing.
-	To reprocess files, just remove the path or delete the log file.
 
 ## Capabilities
 
@@ -98,6 +91,12 @@ pipx install git+https://github.com/MeltanoLabs/tap-csv.git
 ## Usage
 
 You can easily run `tap-csv` by itself or in a pipeline using [Meltano](https://meltano.com/).
+
+Processed files are listed in 
+	LOG_DIR = ".meltano/logs/tap_csv/processed_files.log"
+If path is listed it is omitted from processing.
+To reprocess files just remove the path or delete the log file.
+
 
 ### Executing the Tap Directly
 
